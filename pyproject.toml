@@ -35,6 +35,8 @@ the-datagarden = "the_datagarden.cli:main"
 
 [tool.ruff]
 line-length = 110
+
+[tool.ruff.lint]
 select = [
     "C",  # mccabe rules
     "F",  # pyflakes rules
