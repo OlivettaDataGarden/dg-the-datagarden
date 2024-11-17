@@ -1,6 +1,3 @@
-import click
-import pydantic
-
 from the_datagarden.cli import main
 
 
@@ -13,5 +10,3 @@ def test_main():
 def test_main_with_arg():
     result = main.main(standalone_mode=False, arg1="test")
     assert result is None
-    assert pydantic.BaseModel.model_validate_json(result)
-    assert click.echo(result) == "test"
