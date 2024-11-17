@@ -31,3 +31,22 @@ dev = [
 
 [project.scripts]
 the-datagarden = "the_datagarden.cli:main"
+
+
+[tool.ruff]
+line-length = 110
+select = [
+    "C",  # mccabe rules
+    "F",  # pyflakes rules
+    "E",  # pycodestyle error rules
+    "W",  # pycodestyle warning rules
+    "B",  # flake8-bugbear rules
+    "I",  # isort rules
+]
+ignore = [
+    "C901",  # max-complexity-10
+]
+
+[tool.ruff.format]
+indent-style = "space"
+quote-style = "double"
