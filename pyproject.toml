@@ -24,6 +24,7 @@ classifiers = [
 
 [dependency-groups]
 dev = [
+    "mypy>=1.13.0",
     "pre-commit>=4.0.1",
     "pytest>=8.3.3",
     "ruff>=0.7.4",
@@ -52,19 +53,3 @@ ignore = [
 [tool.ruff.format]
 indent-style = "space"
 quote-style = "double"
-
-[tool.tox]
-legacy_tox_ini = """
-[tox]
-env_list = py312
-requires =
-    tox>=4.11.3
-    tox-uv>=0.1.0
-
-[testenv]
-package = wheel
-wheel_build_env = .pkg
-deps =
-    pytest>=8.3.3
-commands = pytest {posargs:tests}
-"""
