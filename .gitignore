@@ -11,3 +11,13 @@ wheels/
 
 # coverage
 .coverage
+
+# env
+.env
+
+# datagarden settings
+pub-local.sh
+todo.txt
+
+# pypi
+.pkg
