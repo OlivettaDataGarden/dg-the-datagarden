@@ -6,11 +6,31 @@
 the-datagarden documentation
 ============================
 
-Add your content using ``reStructuredText`` syntax. See the
-`reStructuredText <https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html>`_
-documentation for details.
+The-datagarden package is SDK on top of the The-DataGarden API. The SDK makes it easy for you to retrieve
+public data from The-DataGarden API, and locally enrich the public data with your own data. On top of that,
+the SDK provides additional methods to do statistical analysis and calculations with the public data retrieved.
+
+
+
+
+Getting started
+---------------
+If you already have a user account at the-datagarden.io you can directly start using the SDK ::
+
+    # retrieve country object from the datagarden api
+    >>> from the-datagarden import TheDataGardenAPI
+    >>> the_datagarden_api = TheDataGardenAPI(email='your-email@example.com', password='your-password')
+    >>> nl = the_datagarden_api.netherlands()
+    >>> print(nl)
+
+    Country(
+        name='Netherlands',
+        iso_code='NL')
 
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
+
+   authentication
+   create_new_account

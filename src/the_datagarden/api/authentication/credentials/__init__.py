@@ -7,24 +7,30 @@ from the_datagarden.api.authentication.settings import REGISTRATION_URL_EXTENSIO
 
 class CredentialsFromUserInput:
     def get_missing_credentials(self, the_datagarden_api_url: str) -> TheDatagardenCredentialsDict:
+        print()
         print("Credentials to access The Data Garden API are missing.")
         choice = input(
             "Do you want to (1) enroll in the API or (2) provide existing credentials? " "Enter 1 or 2: "
         )
 
         if choice == "1":
-            return self.enroll_to_api(the_datagarden_api_url)
+            credentials = self.enroll_to_api(the_datagarden_api_url)
+            if not credentials:
+                quit()
+            return credentials
+
         elif choice == "2":
             return self.provide_existing_credentials()
         else:
-            raise ValueError("Invalid choice. Please enter 1 or 2.")
+            print("Invalid choice. Please enter 1 or 2.")
+            return self.get_missing_credentials(the_datagarden_api_url)
 
-    def enroll_to_api(self, the_datagarden_api_url: str) -> TheDatagardenCredentialsDict:
+    def enroll_to_api(self, the_datagarden_api_url: str) -> TheDatagardenCredentialsDict | None:
         print("Enrolling in The Data Garden API...")
         email = input("Enter your email: ")
         password = self.get_confirmed_password()
 
-        data = {"email": email, "password1": password, "password2": password}
+        data = {"email": email, "password": password}
         registration_url = the_datagarden_api_url + REGISTRATION_URL_EXTENSION
         response = requests.post(registration_url, data=data)
         if response.status_code == 201:
@@ -34,7 +40,11 @@ class CredentialsFromUserInput:
                 password=password,
             )
         else:
-            raise ValueError(f"Enrollment failed. Error: {response.text}")
+            print("Enrollment failed with error(s):")
+            for field, message_list in response.json().items():
+                print(f"    {field}: {message_list[0]}")
+
+        return None
 
     def get_confirmed_password(self) -> str:
         while True:

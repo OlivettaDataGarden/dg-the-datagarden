@@ -14,12 +14,12 @@ Constants:
 
 """
 
-from ... import __version__
+from the_datagarden.version import __version__
 
 REQ_TOKEN_URL_EXTENSION = "user/token/"
 REFRESH_TOKEN_URL_EXTENSION = "user/token/refresh/"
 
-REGISTRATION_URL_EXTENSION = "auth/registration/"
+REGISTRATION_URL_EXTENSION = "user/enroll/"
 
 HTTPS_PREFIX = "https://"
 BEARER_KEY = "Bearer "

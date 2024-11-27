@@ -75,7 +75,9 @@ class AccessToken:
             data=json.dumps(self._token_payload),
         )
         if not response.status_code == 200:
-            raise ValueError("Token request failed and returned error: " f"{response.text}")
+            print("Token request failed and returned error(s): ")
+            print("    Errorr : ", response.json().get("detail", "No error details provided"))
+            quit()
 
         self._tokens = self._get_response_data(response)
         self._set_token_expiry_time()

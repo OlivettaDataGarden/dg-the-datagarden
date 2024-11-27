@@ -22,6 +22,12 @@ class DatagardenEnvironment(ABC):
 
     CREDENTIALS: type[BaseDataGardenCredentials]
     THE_DATAGARDEN_URL: str
+    ECHO_INIT: bool = True
+
+    def __init__(self):
+        if self.ECHO_INIT:
+            print("Initializing :", self.__class__.__name__)
+            print("At :", self.the_datagarden_url)
 
     def credentials(
         self, email: str | None = None, password: str | None = None
