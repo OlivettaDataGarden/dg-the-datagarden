@@ -23,10 +23,9 @@ import requests
 from the_datagarden.abc.api import BaseApi
 from the_datagarden.abc.authentication import DatagardenEnvironment
 from the_datagarden.api.authentication import AccessToken
-from the_datagarden.api.authentication.environment import (
-    TheDatagardenProductionEnvironment,
-)
+from the_datagarden.api.authentication.environment import TheDatagardenProductionEnvironment
 from the_datagarden.api.authentication.settings import (
+    SHOW_REQ_DETAIL,
     DynamicEndpointCategories,
     URLExtension,
 )
@@ -66,6 +65,12 @@ class BaseDataGardenAPI(BaseApi):
     ):
         url = self._generate_url(url_extension)
         headers = self._tokens.header_with_access_token
+        if SHOW_REQ_DETAIL:
+            print(f"Request URL: {url}")
+            print(f"Request headers: {headers}")
+            print(f"Request method: {method}")
+            print(f"Request payload: {payload}")
+            print(f"Request params: {params}")
         match method:
             case "GET":
                 return requests.get(url, params=params, headers=headers)

@@ -3,7 +3,10 @@ from typing import Literal
 
 from pydantic import BaseModel
 
-from .api import BaseApi
+from the_datagarden.api.authentication.settings import INCLUDE_STATISTIC_PARAM
+from the_datagarden.api.base import BaseApi
+
+from .settings import CONTINENT_AVAILABLE_MODELS_KEY
 
 
 class PeriodTypes:
@@ -35,22 +38,33 @@ class Region:
     A region in The Data Garden.
     """
 
+    _info: dict = {}
     _available_models: list[str] = []
 
     def __init__(self, url: str, api: BaseApi):
         self._url = url
         self._api = api
 
+    @property
     def info(self) -> dict | None:
         """
         Get the region info from the API.
         """
-        info_resp = self._api.retrieve_from_api(
-            url_extension=self._url,
-        )
-        if info_resp:
-            return info_resp.json()
-        return None
+        if not self._info:
+            info_resp = self._api.retrieve_from_api(
+                url_extension=self._url,
+                params=INCLUDE_STATISTIC_PARAM,
+            )
+            if info_resp.status_code == 200:
+                info_resp_json = info_resp.json()
+                self._info = info_resp_json if isinstance(info_resp_json, dict) else {}
+
+        return self._info
+
+    def available_models(self) -> list[str]:
+        if self.info:
+            return self.info.get(CONTINENT_AVAILABLE_MODELS_KEY, [])
+        return []
 
     def generic_regional_data(self) -> dict | None:
         meta_data_resp = self._api.retrieve_from_api(

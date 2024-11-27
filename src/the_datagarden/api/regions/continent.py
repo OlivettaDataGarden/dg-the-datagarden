@@ -1,4 +1,4 @@
-from the_datagarden.abc.regions import Region
+from .base import Region
 
 
 class Continent(Region):
