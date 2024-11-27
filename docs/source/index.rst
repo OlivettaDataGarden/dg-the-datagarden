@@ -34,3 +34,5 @@ If you already have a user account at the-datagarden.io you can directly start u
 
    authentication
    create_new_account
+   the_datagarden_api
+   continent

@@ -31,7 +31,7 @@ or:
     Enter your password: <your-password>
     Initializing : TheDatagardenProductionEnvironment
 
-or setting the environment variables ``DATAGARDEN_EMAIL`` and ``DATAGARDEN_PASSWORD`` in .env:
+or setting the environment variables ``THE_DATAGARDEN_USER_EMAIL`` and ``THE_DATAGARDEN_USER_PASSWORD`` in .env:
 
 .. code-block:: bash
 

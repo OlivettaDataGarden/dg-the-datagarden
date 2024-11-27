@@ -63,9 +63,18 @@ class Region:
 
         return self._info
 
-    def available_models(self) -> list[str]:
+    @property
+    def statistics(self) -> dict:
         if self.info:
-            return self.info.get(self._key(ResponseKeys.AVAILABLE_MODELS), [])
+            return self.info.get(self._key(ResponseKeys.STATISTICS), {})
+        return {}
+
+    def available_models(self, include_details: bool = False) -> list[str]:
+        if self.statistics:
+            available_models = self.statistics.get(self._key(ResponseKeys.AVAILABLE_MODELS), [])
+            if include_details:
+                return available_models
+            return available_models.keys()
         return []
 
     def generic_regional_data(self) -> dict | None:

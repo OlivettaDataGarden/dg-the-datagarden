@@ -119,8 +119,8 @@ class TheDataGardenAPI(BaseDataGardenAPI):
         password: str | None = None,
     ):
         super().__init__(environment, email, password)
-        self.continents()
-        self.country()
+        self._setup_continents()
+        self._setup_countries()
 
     def __getattr__(self, attr: str):
         for _, endpoints in self.DYNAMIC_ENDPOINTS.items():
@@ -133,7 +133,23 @@ class TheDataGardenAPI(BaseDataGardenAPI):
         response = self.retrieve_from_api(URLExtension.WORLD)
         return response.json()
 
-    def continents(self):
+    def continents(self, include_details: bool = False) -> list[str] | dict:
+        continents = (
+            self.DYNAMIC_ENDPOINTS.get(DynamicEndpointCategories.CONTINENTS, None) or self._setup_continents()
+        )
+        if not include_details:
+            return continents.keys()
+        return continents
+
+    def countries(self, include_details: bool = False) -> list[str] | dict:
+        countries = (
+            self.DYNAMIC_ENDPOINTS.get(DynamicEndpointCategories.COUNTRIES, None) or self._setup_countries()
+        )
+        if not include_details:
+            return countries.keys()
+        return countries
+
+    def _setup_continents(self):
         if not self.DYNAMIC_ENDPOINTS.get(DynamicEndpointCategories.CONTINENTS, None):
             continents = self.retrieve_from_api(URLExtension.CONTINENTS)
             for continent in self._records_from_paginated_api_response(continents):
@@ -149,7 +165,7 @@ class TheDataGardenAPI(BaseDataGardenAPI):
 
         return self.DYNAMIC_ENDPOINTS[DynamicEndpointCategories.CONTINENTS]
 
-    def country(self):
+    def _setup_countries(self):
         if not self.DYNAMIC_ENDPOINTS.get(DynamicEndpointCategories.COUNTRIES, None):
             countries = self.retrieve_from_api(URLExtension.COUNTRIES)
             for country in self._records_from_paginated_api_response(countries):
