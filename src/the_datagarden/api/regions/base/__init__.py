@@ -1,4 +1,5 @@
 from datetime import datetime
+from enum import StrEnum
 from typing import Literal
 
 from pydantic import BaseModel
@@ -6,7 +7,7 @@ from pydantic import BaseModel
 from the_datagarden.api.authentication.settings import INCLUDE_STATISTIC_PARAM
 from the_datagarden.api.base import BaseApi
 
-from .settings import CONTINENT_AVAILABLE_MODELS_KEY
+from .settings import ResponseKeys
 
 
 class PeriodTypes:
@@ -40,6 +41,7 @@ class Region:
 
     _info: dict = {}
     _available_models: list[str] = []
+    KEYS: type[StrEnum]
 
     def __init__(self, url: str, api: BaseApi):
         self._url = url
@@ -63,7 +65,7 @@ class Region:
 
     def available_models(self) -> list[str]:
         if self.info:
-            return self.info.get(CONTINENT_AVAILABLE_MODELS_KEY, [])
+            return self.info.get(self._key(ResponseKeys.AVAILABLE_MODELS), [])
         return []
 
     def generic_regional_data(self) -> dict | None:
@@ -74,3 +76,6 @@ class Region:
         if meta_data_resp:
             return meta_data_resp.json()
         return None
+
+    def _key(self, key: str) -> str:
+        return getattr(self.KEYS, key)
