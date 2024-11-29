@@ -30,6 +30,7 @@ from the_datagarden.api.authentication.settings import (
     URLExtension,
 )
 from the_datagarden.api.regions import Continent
+from the_datagarden.api.regions.country import Country
 
 
 class BaseDataGardenAPI(BaseApi):
@@ -172,8 +173,9 @@ class TheDataGardenAPI(BaseDataGardenAPI):
                 country_method_name = country["name"].lower().replace(" ", "_")
                 self.DYNAMIC_ENDPOINTS[DynamicEndpointCategories.COUNTRIES].update(
                     {
-                        country_method_name: self._create_url_extension(
-                            [URLExtension.COUNTRY + country["name"]]
+                        country_method_name: Country(
+                            url=self._create_url_extension([URLExtension.COUNTRY + country["name"]]),
+                            api=self,
                         ),
                     }
                 )

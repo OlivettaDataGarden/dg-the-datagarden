@@ -10,6 +10,8 @@ authors = [
 ]
 dependencies = [
     "click>=8.1.7",
+    "pandas>=2.2.3",
+    "polars>=1.15.0",
     "pydantic>=2.9.2",
     "pyjwt>=2.10.0",
     "python-decouple>=3.8",
