@@ -72,7 +72,6 @@ class TheDataGardenRegionalDataModel:
                 ]
             )
         if self._data_records:
-            print(self._data_records[0])
             self._model_name = self._data_records[0].data_type
 
     def _record_items(self, data: dict):
