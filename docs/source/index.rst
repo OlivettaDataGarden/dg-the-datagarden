@@ -36,3 +36,4 @@ If you already have a user account at the-datagarden.io you can directly start u
    create_new_account
    the_datagarden_api
    continent
+   regional_data_model

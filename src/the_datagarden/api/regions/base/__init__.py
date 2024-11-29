@@ -78,11 +78,13 @@ class Region:
             return self.info.get(self._key(ResponseKeys.STATISTICS), {})
         return {}
 
-    def available_models_names(self) -> list[str]:
+    @property
+    def available_model_names(self) -> list[str]:
         if not self._available_models:
             self._set_available_models()
         return list(self._available_models.keys())
 
+    @property
     def available_models(self) -> dict:
         if not self._available_models:
             self._set_available_models()
@@ -91,7 +93,7 @@ class Region:
 
     @property
     def _api_model_names(self) -> list[str]:
-        return [model.lower() for model in self.available_models()]
+        return [model.lower() for model in self.available_models]
 
     def _set_available_models(self) -> None:
         if self._available_models:

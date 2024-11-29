@@ -42,16 +42,20 @@ class TheDataGardenRegionalDataModel:
     """
 
     _data_records: list[RegionalDataRecord] = []
+    _model_name: str | None = None
 
     def __init__(self, data: dict):
         self.set_items(data)
+
+    def __repr__(self):
+        return f"TheDataGardenRegionalDataModel : {self._model_name} : (count={len(self._data_records)})"
 
     def set_items(self, data: dict):
         for regional_data in data["data_by_region"]:
             base_items = {
                 "name": regional_data.get("region_name", None),
                 "region_type": regional_data.get("region_type", None),
-                "un_region_code": regional_data.get("un_country_code", None),
+                "un_region_code": regional_data.get("un_region_code", None),
                 "iso_cc_2": regional_data.get("iso_cc_2", None),
                 "local_region_code": regional_data.get("local_region_code", None),
                 "local_region_code_type": regional_data.get("local_region_code_type", None),
@@ -67,6 +71,9 @@ class TheDataGardenRegionalDataModel:
                     for data_obj in data_for_region
                 ]
             )
+        if self._data_records:
+            print(self._data_records[0])
+            self._model_name = self._data_records[0].data_type
 
     def _record_items(self, data: dict):
         model_name = data.get("data_type", None)
