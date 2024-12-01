@@ -1,6 +1,5 @@
 from datetime import datetime
 from enum import StrEnum
-from functools import lru_cache
 from typing import Literal
 
 from pydantic import BaseModel
@@ -43,18 +42,29 @@ class Region:
 
     _info: dict = {}
     _available_models: dict = {}
+    _model_data_storage: dict[str, TheDataGardenRegionalDataModel] = {}
 
     KEYS: type[StrEnum]
 
     def __init__(self, url: str, api: BaseApi):
-        self._url = url
+        self._region_url = url
         self._api = api
 
-    def __getattr__(self, attr: str, *args, **kwargs):
+    def __getattr__(self, attr: str):
         if attr in self._api_model_names:
-            return self._model_data_from_api(model=attr, **kwargs)
+            return self._model_data_from_storage(model_name=attr)
 
         raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{attr}'")
+
+    def _model_data_from_storage(self, model_name: str) -> TheDataGardenRegionalDataModel | None:
+        stored_model_data = self._model_data_storage.get(model_name, None)
+        if not stored_model_data:
+            self._model_data_storage[model_name] = TheDataGardenRegionalDataModel(
+                model_name=model_name, api=self._api, region_url=self._region_url
+            )
+            return self._model_data_storage[model_name]
+
+        return stored_model_data
 
     @property
     def info(self) -> dict | None:
@@ -63,7 +73,7 @@ class Region:
         """
         if not self._info:
             info_resp = self._api.retrieve_from_api(
-                url_extension=self._url,
+                url_extension=self._region_url,
                 params=INCLUDE_STATISTIC_PARAM,
             )
             if info_resp.status_code == 200:
@@ -102,17 +112,6 @@ class Region:
         if self.statistics:
             self._available_models = self.statistics.get(self._key(ResponseKeys.AVAILABLE_MODELS), [])
         return
-
-    @lru_cache(maxsize=1000)  # noqa: B019
-    def _model_data_from_api(self, model: str, **kwargs) -> TheDataGardenRegionalDataModel | None:
-        model_data_resp = self._api.retrieve_from_api(
-            url_extension=self._url + "regional_data/",
-            method="POST",
-            payload={"model": model, **kwargs},
-        )
-        if model_data_resp:
-            return TheDataGardenRegionalDataModel(model_data_resp.json())
-        return None
 
     def generic_regional_data(self, model: str, **kwargs) -> dict | None:
         meta_data_resp = self._api.retrieve_from_api(

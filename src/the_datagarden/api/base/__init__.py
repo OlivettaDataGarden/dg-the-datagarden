@@ -113,15 +113,25 @@ class BaseDataGardenAPI(BaseApi):
 
 
 class TheDataGardenAPI(BaseDataGardenAPI):
+    _instance = None
+    _initialized = False
+
+    def __new__(cls, *args, **kwargs):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+        return cls._instance
+
     def __init__(
         self,
         environment: type[DatagardenEnvironment] | None = None,
         email: str | None = None,
         password: str | None = None,
     ):
-        super().__init__(environment, email, password)
-        self._setup_continents()
-        self._setup_countries()
+        if not self._initialized:
+            super().__init__(environment, email, password)
+            self._setup_continents()
+            self._setup_countries()
+            self.__class__._initialized = True
 
     def __getattr__(self, attr: str):
         for _, endpoints in self.DYNAMIC_ENDPOINTS.items():
