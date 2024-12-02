@@ -46,6 +46,9 @@ class Region:
 
     KEYS: type[StrEnum]
 
+    def __repr__(self):
+        return f"Region {self.info.get('name', '')}"
+
     def __init__(self, url: str, api: BaseApi):
         self._region_url = url
         self._api = api
@@ -95,11 +98,11 @@ class Region:
         return list(self._available_models.keys())
 
     @property
-    def available_models(self) -> dict:
+    def available_models(self) -> set:
         if not self._available_models:
             self._set_available_models()
 
-        return self._available_models
+        return {item for models_per_level in self._available_models.values() for item in models_per_level}
 
     @property
     def _api_model_names(self) -> list[str]:
@@ -110,7 +113,7 @@ class Region:
             return
 
         if self.statistics:
-            self._available_models = self.statistics.get(self._key(ResponseKeys.AVAILABLE_MODELS), [])
+            self._available_models = self._info.get(self._key(ResponseKeys.AVAILABLE_MODELS), [])
         return
 
     def generic_regional_data(self, model: str, **kwargs) -> dict | None:

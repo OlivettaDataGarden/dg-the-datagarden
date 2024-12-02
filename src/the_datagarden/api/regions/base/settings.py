@@ -15,5 +15,5 @@ class ContinentKeys(RegionKeys):
 
 
 class CountryKeys(RegionKeys):
-    AVAILABLE_MODELS = "available_data_on_country_level"
+    AVAILABLE_MODELS = "models_per_region_level"
     STATISTICS = "country_statistics"

@@ -14,6 +14,7 @@ UNIQUE_FIELDS = [
     "region_level",
     "period",
     "period_type",
+    "source_name",
 ]
 
 
@@ -31,12 +32,17 @@ class RegionalDataRecord(BaseModel):
     source_name: str | None = None
     period: str | None = None
     period_type: str | None = None
-    data_type: str | None = None
+    data_model_name: str | None = None
     model: DataGardenModel
 
     def record_hash(self) -> str:
         hash_str = ".".join([str(getattr(self, key)) for key in sorted(UNIQUE_FIELDS)])
         return str(hash(hash_str))
+
+    def __str__(self):
+        return (
+            f"RegionalDataRecord: {self.name} ({self.data_model_name} for {self.period}, {self.period_type})"
+        )
 
 
 class TheDataGardenRegionalDataModel:
@@ -58,15 +64,12 @@ class TheDataGardenRegionalDataModel:
     - full_model_to_pandas() -> pd.DataFrame
     """
 
-    _data_records: dict[str, RegionalDataRecord] = {}
-    _model_name: str | None = None
-    _request_params_hashes: list[str] = []
-    _api: "BaseApi"
-
     def __init__(self, api: "BaseApi", model_name: str, region_url: str):
-        self._api = api
-        self._model_name = model_name
-        self._region_url = region_url
+        self._api: BaseApi = api
+        self._model_name: str = model_name
+        self._region_url: str = region_url
+        self._request_params_hashes: list[str] = []
+        self._data_records: dict[str, RegionalDataRecord] = {}
 
     def __str__(self):
         return f"TheDataGardenRegionalDataModel : {self._model_name} : (count={len(self._data_records)})"
@@ -77,7 +80,7 @@ class TheDataGardenRegionalDataModel:
     def __call__(self, **kwargs) -> None:
         request_hash = self.request_hash(**kwargs)
         if request_hash not in self._request_params_hashes:
-            regional_data = self.regional_data_from_api(**kwargs)
+            regional_data = self.regional_paginated_data_from_api(**kwargs)
             if regional_data:
                 self.set_items(regional_data)
             self._request_params_hashes.append(request_hash)
@@ -86,6 +89,33 @@ class TheDataGardenRegionalDataModel:
         sorted_items = sorted(kwargs.items())
         hash_str = ",".join(f"{k}:{v}" for k, v in sorted_items)
         return str(hash(hash_str))
+
+    def _response_has_next_page(self, model_data_resp: dict) -> bool:
+        pagination = model_data_resp.get("pagination", None)
+        if not pagination:
+            return False
+        return pagination.get("next_page", None) is not None
+
+    def _next_page_pagination(self, model_data_resp: dict) -> dict | None:
+        pagination = model_data_resp.pop("pagination", None)
+        if not pagination:
+            return None
+        next_page = pagination.get("next_page", None)
+        if not next_page:
+            return None
+        return {"page": next_page}
+
+    def regional_paginated_data_from_api(self, **kwargs):
+        model_data_resp = self.regional_data_from_api(**kwargs)
+        while self._response_has_next_page(model_data_resp):
+            next_page_pagination = self._next_page_pagination(model_data_resp)
+            if next_page_pagination:
+                next_page_resp = self.regional_data_from_api(pagination=next_page_pagination, **kwargs)
+                if next_page_resp:
+                    model_data_resp["data_by_region"].extend(next_page_resp["data_by_region"])
+                    model_data_resp["pagination"] = next_page_resp["pagination"]
+
+        return model_data_resp
 
     def regional_data_from_api(self, **kwargs) -> dict | None:
         model_data_resp = self._api.retrieve_from_api(
@@ -121,12 +151,15 @@ class TheDataGardenRegionalDataModel:
 
         if self._data_records:
             _, first_record = list(self._data_records.items())[0]
-            self._model_name = first_record.data_type
+            model_name = first_record.data_model_name
+            if not model_name:
+                raise ValueError("data_model_name is required")
+            self._model_name = model_name
 
     def _record_items(self, data: dict):
         model_name = data.get("data_type", None)
         if not model_name:
-            raise ValueError("data_type is required")
+            raise ValueError("data_model_name is required")
 
         model = getattr(DatagardenModels, model_name.upper())
         if not model:
@@ -135,7 +168,7 @@ class TheDataGardenRegionalDataModel:
             "source_name": data.get("source_name", None),
             "period": data.get("period", None),
             "period_type": data.get("period_type", None),
-            "data_type": data.get("data_type", None),
+            "data_model_name": data.get("data_type", None),
             "model": model(**data.get("data", {})),
         }
 
@@ -170,7 +203,7 @@ class TheDataGardenRegionalDataModel:
 
     def flatten_dict(self, dict_to_flatten: dict, flattened_dict: dict, prefix: str = "") -> dict:
         for key, value in dict_to_flatten.items():
-            new_key = f"{prefix}_{key}" if prefix else key
+            new_key = f"{prefix}.{key}" if prefix else key
             if isinstance(value, dict):
                 flattened_dict.update(self.flatten_dict(value, flattened_dict, new_key))
             else:
@@ -212,3 +245,7 @@ class TheDataGardenRegionalDataModel:
     def __len__(self):
         """Returns the number of records"""
         return len(self._data_records)
+
+    @property
+    def data_records(self) -> list[RegionalDataRecord]:
+        return list(self._data_records.values())

@@ -1,8 +1,10 @@
 =======================
 The Regional Data Model
 =======================
-In order to use the The-DataGarden API, you need to authenticate yourself. This can be done by providing your
-credentials to the TheDataGardenAPI object. There three ways to do that:
+
+The Basics of the Regional Data Model
+-------------------------------------
+The regional data model is a class that is used to store regional data records for a given data model.
 
 .. code-block:: python
 
