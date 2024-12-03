@@ -1,3 +1,5 @@
+from typing import Any
+
 import pandas as pd
 import polars as pl
 from pydantic import BaseModel
@@ -36,7 +38,6 @@ class Feature(BaseModel):
 class RegionGeoJSONDataRecord(BaseModel):
     name: str | None = None
     region_type: str | None = None
-    un_region_code: str | None = None
     iso_cc_2: str | None = None
     local_region_code: str | None = None
     local_region_code_type: str | None = None
@@ -118,10 +119,12 @@ class TheDataGardenRegionGeoJSONModel:
 
         return geojson_data_resp
 
-    def geojson_data_from_api(self, region_level: int, pagination: dict | None = None) -> dict | None:
-        payload = {"region_level": region_level}
+    def geojson_data_from_api(
+        self, region_level: int, pagination: dict[str, str] | None = None
+    ) -> dict | None:
+        payload: dict[str, Any] = {"region_level": region_level}
         if pagination:
-            payload.update(pagination)
+            payload = payload | {"pagination": pagination}
         geojson_data_resp = self._api.retrieve_from_api(
             url_extension=self._region_url + "geojson/",
             method="POST",
@@ -137,7 +140,6 @@ class TheDataGardenRegionGeoJSONModel:
             data_record_items = {
                 "name": feature.properties.name,
                 "region_type": feature.properties.region_type,
-                "un_region_code": feature.properties.un_region_code,
                 "iso_cc_2": feature.properties.iso_cc_2,
                 "local_region_code": feature.properties.local_region_code,
                 "local_region_code_type": feature.properties.local_region_code_type,
