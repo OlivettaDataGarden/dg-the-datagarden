@@ -6,7 +6,7 @@ from pydantic import BaseModel
 
 from the_datagarden.api.authentication.settings import INCLUDE_STATISTIC_PARAM
 from the_datagarden.api.base import BaseApi
-from the_datagarden.models import TheDataGardenRegionalDataModel
+from the_datagarden.models import TheDataGardenRegionalDataModel, TheDataGardenRegionGeoJSONModel
 
 from .settings import ResponseKeys
 
@@ -52,10 +52,13 @@ class Region:
     def __init__(self, url: str, api: BaseApi):
         self._region_url = url
         self._api = api
+        self._geojsons = TheDataGardenRegionGeoJSONModel(api=api, region_url=url)
 
     def __getattr__(self, attr: str):
         if attr in self._api_model_names:
             return self._model_data_from_storage(model_name=attr)
+        if attr == "geojsons":
+            return self._geojsons
 
         raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{attr}'")
 
