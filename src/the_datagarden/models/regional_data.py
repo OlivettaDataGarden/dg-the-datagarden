@@ -83,7 +83,7 @@ class TheDataGardenRegionalDataModel:
             regional_data = self.regional_paginated_data_from_api(**kwargs)
             if regional_data:
                 self.set_items(regional_data)
-            self._request_params_hashes.append(request_hash)
+                self._request_params_hashes.append(request_hash)
         return self
 
     def request_hash(self, **kwargs) -> str:
@@ -106,8 +106,10 @@ class TheDataGardenRegionalDataModel:
             return None
         return {"page": next_page}
 
-    def regional_paginated_data_from_api(self, **kwargs):
+    def regional_paginated_data_from_api(self, **kwargs) -> dict:
         model_data_resp = self.regional_data_from_api(**kwargs)
+        if not model_data_resp:
+            return {}
         while self._response_has_next_page(model_data_resp):
             next_page_pagination = self._next_page_pagination(model_data_resp)
             if next_page_pagination:
@@ -118,7 +120,7 @@ class TheDataGardenRegionalDataModel:
 
         return model_data_resp
 
-    def regional_data_from_api(self, **kwargs) -> dict | None:
+    def regional_data_from_api(self, **kwargs) -> dict:
         model_data_resp = self._api.retrieve_from_api(
             url_extension=self._region_url + "regional_data/",
             method="POST",
@@ -126,7 +128,7 @@ class TheDataGardenRegionalDataModel:
         )
         if model_data_resp:
             return model_data_resp.json()
-        return None
+        return {}
 
     def set_items(self, data: dict):
         for regional_data in data["data_by_region"]:

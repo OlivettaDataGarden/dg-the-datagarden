@@ -88,7 +88,7 @@ class TheDataGardenRegionGeoJSONModel:
             features = self.geojson_paginated_data_from_api(region_level=region_level)
             if features:
                 self.set_items(features)
-            self._levels_requested.append(region_level)
+                self._levels_requested.append(region_level)
         return self
 
     def _response_has_next_page(self, model_data_resp: dict) -> bool:
