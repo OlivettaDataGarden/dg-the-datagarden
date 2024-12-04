@@ -92,7 +92,7 @@ Read more
 
 Access to The DataGarden API
 ----------------------------
-To use the DataGarden SDK, you need access to the The DataGarden API. Simply regsiter for free at https://www.the-datagarden.io
+To use the DataGarden SDK, you need access to the The DataGarden API. Simply register for free at https://www.the-datagarden.io
 and you will have an inital free access account to the API with access to country and continent data.
 
-Visit https://www.the-datagarden.io for to register for free. Also, check out the :doc:`authentication`.
+Visit https://www.the-datagarden.io for to register for free.
