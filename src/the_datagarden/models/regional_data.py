@@ -75,15 +75,16 @@ class TheDataGardenRegionalDataModel:
         return f"TheDataGardenRegionalDataModel : {self._model_name} : (count={len(self._data_records)})"
 
     def __repr__(self):
-        return self
+        return self.__str__()
 
-    def __call__(self, **kwargs) -> None:
+    def __call__(self, **kwargs) -> "TheDataGardenRegionalDataModel":
         request_hash = self.request_hash(**kwargs)
         if request_hash not in self._request_params_hashes:
             regional_data = self.regional_paginated_data_from_api(**kwargs)
             if regional_data:
                 self.set_items(regional_data)
             self._request_params_hashes.append(request_hash)
+        return self
 
     def request_hash(self, **kwargs) -> str:
         sorted_items = sorted(kwargs.items())

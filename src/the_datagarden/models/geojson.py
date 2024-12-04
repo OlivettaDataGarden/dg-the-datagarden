@@ -78,17 +78,18 @@ class TheDataGardenRegionGeoJSONModel:
         self._geojson_records: dict[str, RegionGeoJSONDataRecord] = {}
 
     def __str__(self):
-        return f"TheDataGardenRegionalDataModel : GeoJSON : (count={len(self._geojson_records)})"
+        return f"TheDataGardenRegionGeoJSONModel : GeoJSON : (count={len(self._geojson_records)})"
 
     def __repr__(self):
-        return self
+        return self.__str__()
 
-    def __call__(self, region_level: int = 0) -> None:
+    def __call__(self, region_level: int = 0) -> "TheDataGardenRegionGeoJSONModel":
         if region_level not in self._levels_requested:
             features = self.geojson_paginated_data_from_api(region_level=region_level)
             if features:
                 self.set_items(features)
             self._levels_requested.append(region_level)
+        return self
 
     def _response_has_next_page(self, model_data_resp: dict) -> bool:
         pagination = model_data_resp.get("pagination", None)

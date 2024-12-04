@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
 
+from requests import Response
+
 from the_datagarden.abc.authentication import DatagardenEnvironment
 
 
@@ -14,4 +16,4 @@ class BaseApi(ABC):
         method: str = "GET",
         payload: dict | None = None,
         params: dict | None = None,
-    ): ...
+    ) -> Response | None: ...

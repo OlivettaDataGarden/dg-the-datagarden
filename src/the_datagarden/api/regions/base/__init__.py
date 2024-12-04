@@ -82,7 +82,7 @@ class Region:
                 url_extension=self._region_url,
                 params=INCLUDE_STATISTIC_PARAM,
             )
-            if info_resp.status_code == 200:
+            if info_resp and info_resp.status_code == 200:
                 info_resp_json = info_resp.json()
                 self._info = info_resp_json if isinstance(info_resp_json, dict) else {}
 

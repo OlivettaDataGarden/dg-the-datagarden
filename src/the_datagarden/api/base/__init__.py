@@ -19,6 +19,7 @@ from collections import defaultdict
 from typing import Iterator
 
 import requests
+from requests import Response
 
 from the_datagarden.abc.api import BaseApi
 from the_datagarden.abc.authentication import DatagardenEnvironment
@@ -63,7 +64,7 @@ class BaseDataGardenAPI(BaseApi):
         method: str = "GET",
         payload: dict | None = None,
         params: dict | None = None,
-    ):
+    ) -> Response | None:
         url = self._generate_url(url_extension)
         headers = self._tokens.header_with_access_token
         if SHOW_REQ_DETAIL:
@@ -74,11 +75,23 @@ class BaseDataGardenAPI(BaseApi):
             print(f"Request params: {params}")
         match method:
             case "GET":
-                return requests.get(url, params=params, headers=headers)
+                response = requests.get(url, params=params, headers=headers)
             case "POST":
-                return requests.post(url, json=payload, headers=headers)
+                response = requests.post(url, json=payload, headers=headers)
             case _:
                 raise ValueError(f"Invalid method: {method}")
+
+        return self._response_handler(response)
+
+    def _response_handler(self, response: requests.Response) -> Response | None:
+        if response.status_code == 200:
+            return response
+        else:
+            response_dict = response.json()
+            for k, v in response_dict.items():
+                print(k)
+                print(v)
+            return None
 
     def _get_next_page(self, response: requests.Response) -> requests.Response | None:
         next_url = response.json().get("next")
@@ -179,6 +192,8 @@ class TheDataGardenAPI(BaseDataGardenAPI):
     def _setup_countries(self):
         if not self.DYNAMIC_ENDPOINTS.get(DynamicEndpointCategories.COUNTRIES, None):
             countries = self.retrieve_from_api(URLExtension.COUNTRIES)
+            if not countries:
+                return None
             for country in self._records_from_paginated_api_response(countries):
                 country_method_name = country["name"].lower().replace(" ", "_")
                 self.DYNAMIC_ENDPOINTS[DynamicEndpointCategories.COUNTRIES].update(
