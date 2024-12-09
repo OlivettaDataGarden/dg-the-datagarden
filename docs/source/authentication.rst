@@ -2,7 +2,13 @@
 Authentication
 ==============
 In order to use the The-DataGarden API, you need to authenticate yourself. This can be done by providing your
-credentials to the TheDataGardenAPI object. There three ways to do that:
+credentials to the TheDataGardenAPI object.
+
+Authenticating
+--------------
+
+When you already have an account, you can authenticate by providing your email and password to the TheDataGardenAPI object.
+There are three ways to do that:
 
 .. code-block:: python
 
@@ -53,11 +59,13 @@ Once these variables are set, you can initialize the TheDataGardenAPI instance w
 
 
 
-In order to use the The-DataGarden API, you to have an account. If you do not have one yet
-you can directly enroll from the Python SDK. This will create a free account for you with limited access.
-For getting more access to the different models see `The-DataGarden website <https://www.the-datagarden.io>`_.
+Creating an account
+-------------------
 
-If you use the TheDataGardenAPI object without providing any credentials, you can choose to direcly create an account in the API.
+If you do not have an account yet, you can directly enroll from the Python SDK. This will create a free account for you with access to the country and continent data.
+For getting more access to the different region types and models see `The-DataGarden website <https://www.the-datagarden.io>`_.
+
+Creating an account via the SDK can simply be done by calling the TheDataGardenAPI object without providing any credentials:
 
 
 .. code-block:: python

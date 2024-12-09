@@ -1,12 +1,12 @@
 [project]
 name = "the-datagarden"
-version = "0.1.0"
-description = "Accessing public data made easy for everyone."
-readme = "README.md"
+version = "1.1.0"
+description = "Public data made easy."
+readme = "README.rst"
 requires-python = ">=3.10"
 license = { text = "MIT" }  # Specifies the MIT license
 authors = [
-    { name = "Maarten de Ruyter", email = "maarten@the-datagarden.io" }
+    { name = "Maarten de Ruyter", email = "info@the-datagarden.io" }
 ]
 dependencies = [
     "click>=8.1.7",
@@ -40,6 +40,12 @@ dev = [
 
 [project.scripts]
 the-datagarden = "the_datagarden.cli:main"
+
+[project.urls]
+"Read the Docs" = "https://the-datagarden.readthedocs.io/"
+"The-DataGarden" = "https://www.the-datagarden.io/"
+"API documentation" = "https://api.the-datagarden.io/api-docs"
+"Source" = "https://github.com/the-datagarden/the-datagarden"
 
 
 [tool.ruff]
