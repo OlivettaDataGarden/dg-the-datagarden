@@ -1,6 +1,6 @@
-===================================
-The Regional Data Model, The Basics
-===================================
+=======================
+The Regional Data Model
+=======================
 
 The Basics of the Regional Data Model
 -------------------------------------
@@ -21,7 +21,7 @@ Lets look at an example of how to use the object.
 
     TheDataGardenRegionalDataModel : demographics : (count=0)
 
-The object is an instance of the TheDataGardenRegionalDataModel thay shows what model it represents and how many records are available.
+The object is an instance of the ``TheDataGardenRegionalDataModel`` thay shows what model it represents and how many records are available.
 Upon initialization the object will not have any records. Adding records to the object is done by calling the object.
 
 
