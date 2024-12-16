@@ -148,8 +148,8 @@ class TheDataGardenAPI(BaseDataGardenAPI):
 
     def __getattr__(self, attr: str):
         for _, endpoints in self.DYNAMIC_ENDPOINTS.items():
-            if attr in endpoints:
-                return endpoints[attr]
+            if attr.lower() in endpoints:
+                return endpoints[attr.lower()]
 
         raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{attr}'")
 
@@ -183,7 +183,7 @@ class TheDataGardenAPI(BaseDataGardenAPI):
                         continent_method_name: Continent(
                             url=self._create_url_extension([URLExtension.CONTINENT + continent["name"]]),
                             api=self,
-                            name=continent["name"],
+                            name=continent["name"].lower(),
                         ),
                     }
                 )
@@ -197,13 +197,18 @@ class TheDataGardenAPI(BaseDataGardenAPI):
                 return None
             for country in self._records_from_paginated_api_response(countries):
                 country_method_name = country["name"].lower().replace(" ", "_")
+                country_code = country["iso_cc_2"].lower()
+                continent = country["parent_region"].lower()
+                country = Country(
+                    url=self._create_url_extension([URLExtension.COUNTRY + country["name"]]),
+                    api=self,
+                    name=country["name"],
+                    continent=continent,
+                )
                 self.DYNAMIC_ENDPOINTS[DynamicEndpointCategories.COUNTRIES].update(
                     {
-                        country_method_name: Country(
-                            url=self._create_url_extension([URLExtension.COUNTRY + country["name"]]),
-                            api=self,
-                            name=country["name"],
-                        ),
+                        country_method_name: country,
+                        country_code: country,
                     }
                 )
 

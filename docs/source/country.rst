@@ -22,6 +22,19 @@ The object ``germany`` is an instance of the class ``Country`` represented by th
     Country : Germany
     <class 'the_datagarden.api.regions.country.Country'>
 
+The country object also be retrieved using is ISO 3166-1 alpha-2 country code (both upper and lower case are supported).
+
+.. code-block:: python
+
+    # Retrieving the country object for Germany and United States using their ISO 3166-1 alpha-2 country codes
+    >>> from the_datagarden import TheDataGardenAPI
+    >>> my_datagarden_api = TheDataGardenAPI()
+    >>> germany = my_datagarden_api.DE
+    >>> united_states = my_datagarden_api.us
+    >>> print(germany)
+    >>> print(united_states)
+    Country : Germany
+    Country : United States of America
 
 The country's meta data
 -----------------------

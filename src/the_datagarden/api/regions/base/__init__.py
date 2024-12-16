@@ -48,13 +48,14 @@ class Region:
     def __repr__(self):
         return f"{self.__class__.__name__} : {self._name}"
 
-    def __init__(self, url: str, api: BaseApi, name: str):
+    def __init__(self, url: str, api: BaseApi, name: str, continent: str | None = None):
         self._region_url = url
         self._api = api
         self._available_models: dict = {}
         self._model_data_storage: dict[str, TheDataGardenRegionalDataModel] = {}
         self._geojsons = TheDataGardenRegionGeoJSONModel(api=api, region_url=url)
         self._name = name
+        self._continent = continent
 
     def __getattr__(self, attr: str):
         if attr in self.available_model_names:
