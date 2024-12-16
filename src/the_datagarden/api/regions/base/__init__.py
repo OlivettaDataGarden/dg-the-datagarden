@@ -46,14 +46,15 @@ class Region:
     KEYS: type[StrEnum]
 
     def __repr__(self):
-        return f"Region {self.info.get('name', '')}"
+        return f"{self.__class__.__name__} : {self._name}"
 
-    def __init__(self, url: str, api: BaseApi):
+    def __init__(self, url: str, api: BaseApi, name: str):
         self._region_url = url
         self._api = api
         self._available_models: dict = {}
         self._model_data_storage: dict[str, TheDataGardenRegionalDataModel] = {}
         self._geojsons = TheDataGardenRegionGeoJSONModel(api=api, region_url=url)
+        self._name = name
 
     def __getattr__(self, attr: str):
         if attr in self.available_model_names:
