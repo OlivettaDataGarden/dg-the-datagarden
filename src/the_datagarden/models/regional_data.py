@@ -1,6 +1,7 @@
 import pandas as pd
 import polars as pl
-from datagarden_models import DataGardenModel, DatagardenModels
+from datagarden_models import DataGardenModel, DatagardenModels, DataGardenSubModel, RegionalDataStats
+from datagarden_models.models.base.legend import Legend
 from pydantic import BaseModel
 
 from the_datagarden.api.base import BaseApi
@@ -33,7 +34,7 @@ class RegionalDataRecord(BaseModel):
     period: str | None = None
     period_type: str | None = None
     data_model_name: str | None = None
-    model: DataGardenModel
+    model: DataGardenSubModel
 
     def record_hash(self) -> str:
         hash_str = ".".join([str(getattr(self, key)) for key in sorted(UNIQUE_FIELDS)])
@@ -43,6 +44,18 @@ class RegionalDataRecord(BaseModel):
         return (
             f"RegionalDataRecord: {self.name} ({self.data_model_name} for {self.period}, {self.period_type})"
         )
+
+    @property
+    def datgarden_model_class(self) -> type[DataGardenModel]:
+        return self.model.__class__
+
+    def record_for_sub_model(self, sub_model_name: str) -> "RegionalDataRecord":
+        if sub_model_name not in self.datgarden_model_class.legends().sub_model_names:
+            raise ValueError(f"Sub model `{sub_model_name}` not found in {self.datgarden_model_class}")
+        child_record = self.model_dump()
+        child_record["data_model_name"] = sub_model_name
+        child_record["model"] = getattr(self.model, sub_model_name)
+        return RegionalDataRecord(**child_record)
 
 
 class TheDataGardenRegionalDataModel:
@@ -64,12 +77,23 @@ class TheDataGardenRegionalDataModel:
     - full_model_to_pandas() -> pd.DataFrame
     """
 
-    def __init__(self, api: "BaseApi", model_name: str, region_url: str):
+    def __init__(
+        self,
+        api: "BaseApi",
+        model_name: str,
+        region_url: str,
+        meta_data: BaseModel,
+        is_sub_model: bool = False,
+        model: type[DataGardenSubModel] | None = None,
+    ):
         self._api: BaseApi = api
         self._model_name: str = model_name
         self._region_url: str = region_url
         self._request_params_hashes: list[str] = []
         self._data_records: dict[str, RegionalDataRecord] = {}
+        self.meta_data: BaseModel = meta_data
+        self._model: DataGardenModel = model or getattr(DatagardenModels, model_name.upper())
+        self._is_sub_model: bool = is_sub_model
 
     def __str__(self):
         return f"TheDataGardenRegionalDataModel : {self._model_name} : (count={len(self._data_records)})"
@@ -78,6 +102,11 @@ class TheDataGardenRegionalDataModel:
         return self.__str__()
 
     def __call__(self, **kwargs) -> "TheDataGardenRegionalDataModel":
+        if self._is_sub_model:
+            raise TypeError(
+                "Sub model data cannot be used to retrieve data. "
+                "Use the main model data object to make calls to The-Datagarden API"
+            )
         request_hash = self.request_hash(**kwargs)
         if request_hash not in self._request_params_hashes:
             regional_data = self.regional_paginated_data_from_api(**kwargs)
@@ -85,6 +114,30 @@ class TheDataGardenRegionalDataModel:
                 self.set_items(regional_data)
                 self._request_params_hashes.append(request_hash)
         return self
+
+    def __getattr__(self, attribute: str) -> "TheDataGardenRegionalDataModel":
+        if attribute not in self._model.legends().sub_model_names:
+            raise ValueError(f"Attribute {attribute} is not a sub-model of {self._model_name}")
+        sub_model = getattr(self._model.legends(), attribute).model
+        regional_data_for_attribute = TheDataGardenRegionalDataModel(
+            api=self._api,
+            model_name=attribute,
+            region_url=self._region_url,
+            meta_data=self.meta_data,
+            is_sub_model=True,
+            model=sub_model,
+        )
+        regional_data_for_attribute._data_records = {
+            key: value.record_for_sub_model(attribute) for key, value in self._data_records.items()
+        }
+        return regional_data_for_attribute
+
+    @property
+    def model_attributes(self) -> list[str]:
+        return self._model.legends().attributes
+
+    def model_attribute_legend(self, attribute: str) -> Legend:
+        return getattr(self._model.legends(), attribute)
 
     def request_hash(self, **kwargs) -> str:
         sorted_items = sorted(kwargs.items())
@@ -252,3 +305,40 @@ class TheDataGardenRegionalDataModel:
     @property
     def data_records(self) -> list[RegionalDataRecord]:
         return list(self._data_records.values())
+
+    def regional_availability(self) -> dict[str, RegionalDataStats | None]:
+        availability_per_region = self.meta_data.statistics_for_data_model(model_name=self._model_name)
+        regional_availability = {}
+        for region_type in self.meta_data.region_types:
+            if region_type in availability_per_region.keys():
+                regional_availability[region_type] = availability_per_region[region_type]
+            else:
+                regional_availability[region_type] = None
+        return regional_availability
+
+    @property
+    def regions_with_model_data(self) -> list[str]:
+        return [region for region in self.regional_availability() if self.regional_availability()[region]]
+
+    def show_summary(self):
+        """
+        Outputs a summary of the model's structure (submodels and attributes)
+        """
+        self._model.legends().show_summary()
+
+    def summary(self) -> dict:
+        """
+        rer model's structure (submodels and attributes)
+        """
+        return self._model.legends().summary()
+
+    def describe(self) -> pl.DataFrame:
+        return self.full_model_to_polars().describe()
+
+    def show_availability_per_attribute(self):
+        describe_df = self.describe()
+        columns_not_to_show = ["statistic", "name", "region_type"]
+        row_dicts_df = describe_df.select(
+            [col for col in describe_df.columns if col not in columns_not_to_show]
+        )
+        print(row_dicts_df)

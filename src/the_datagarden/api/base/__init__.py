@@ -183,6 +183,7 @@ class TheDataGardenAPI(BaseDataGardenAPI):
                         continent_method_name: Continent(
                             url=self._create_url_extension([URLExtension.CONTINENT + continent["name"]]),
                             api=self,
+                            name=continent["name"],
                         ),
                     }
                 )
@@ -201,6 +202,7 @@ class TheDataGardenAPI(BaseDataGardenAPI):
                         country_method_name: Country(
                             url=self._create_url_extension([URLExtension.COUNTRY + country["name"]]),
                             api=self,
+                            name=country["name"],
                         ),
                     }
                 )

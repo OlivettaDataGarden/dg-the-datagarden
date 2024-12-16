@@ -11,9 +11,9 @@ class RegionKeys(StrEnum): ...
 
 class ContinentKeys(RegionKeys):
     AVAILABLE_MODELS = "available_data_on_continent_level"
-    STATISTICS = "continent_statistics"
+    STATISTICS = "statistics"
 
 
 class CountryKeys(RegionKeys):
     AVAILABLE_MODELS = "models_per_region_level"
-    STATISTICS = "country_statistics"
+    STATISTICS = "statistics"
