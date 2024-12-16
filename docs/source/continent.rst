@@ -1,84 +1,156 @@
 ================
 Continent Object
 ================
-The continent object provides methods to get data on a continent or to access subregion (countries) objects from the continent.
 
-To get an overview of which data models are available for a continent object, you can call
+The Continent object
+--------------------
+The continent object provides methods to get public data for a continent or its direct subregions (i.e. the countries).
+A countint object can simply be retrieved from TheDataGardenAPI object by calling the continent name:
+
+.. code-block:: python
+
+    # Retrieving the continent object for Europe from The DataGarden API
+    >>> from the_datagarden import TheDataGardenAPI
+    >>> my_datagarden_api = TheDataGardenAPI()
+    >>> europe = my_datagarden_api.europe
+    >>> print(europe)
+    >>> print(type(europe))
+
+.. code-block:: console
+
+    Continent : Europe
+    <class 'the_datagarden.api.regions.continent.Continent'>
+
+
+The continent's meta data
+-------------------------
+To find out more about a continent's sub regional structure as well as what data is available for a continent you can
+fetch a meta data object from the continent. The ``europe_meta_data`` object below can be used to get an overview of available region types.
+
+.. code-block:: python
+
+    # Retrieving the meta data for Europe and the available region types
+    >>> europe = my_datagarden_api.europe
+    >>> europe_meta_data = europe.meta_data
+    >>> print(europe_meta_data.region_types)
+
+For the continent object only the continent and country region types are available. For subregions within the countries you need to go
+to the country object.
+
+.. code-block:: console
+
+    ['continent', 'country']
+
+To get an overview of which data models are available for a continent object and its subregions (i.e. the countries), you can call
 the `available_model_names`  method on the TheDataGardenAPI continent object:
 
 .. code-block:: python
 
     # Retrieving available data models for Europe
-    >>> from from the_datagarden import TheDataGardenAPI
-    >>> my_datagarden_api = TheDataGardenAPI()
     >>> europe = my_datagarden_api.europe
-    >>> print(europe.available_model_names)
+    >>> europe_meta_data = europe.meta_data
+    >>> print(europe_meta_data.continent.regional_data_models) # will only show data models available for continent
+    >>> print(europe_meta_data.country.regional_data_models) # will show data models available for all countries in continent
 
-.. code-block:: console
-
-    ['Economics', 'Demographics']
-
-This method returns a list of available data models.
-
-If you want to get more information about the available datamodels, you can call the `available_models` method:
+You can get more specific information for a specific data model on regional level.
 
 .. code-block:: python
 
-    # Retrieving detailed information about the available data models
+    # Retrieving the detailed information for the economics data model for Europe
     >>> europe = my_datagarden_api.europe
-    >>> print(europe.available_models)
+    >>> continent_only_meta_data = europe.meta_data.continent
+    >>> economics_meta_data = continent_only_meta_data.economics
+    >>> print(economics_meta_data.source_names)
+    ['UNCTAD']
+    >>> print(economics_meta_data.period_types)
+    ['Y']
+    >>> print(economics_meta_data.from_period)
+    '1970-01-01T00:00:00Z'
+    >>> print(economics_meta_data.to_period)
+    '2023-01-01T00:00:00Z'
+
+The economics data model for Europe is available from the UNCTAD source and is available from 1970 to up to and including 2023
+and has Yearly datapoints.
 
 
-This returns a dictionary with the continent names as keys and the continent objects as values:
-
-.. code-block:: json
-
-    {
-        "Economics": {
-            "count": 19,
-            "sources": ["UNCTAD"],
-            "to_period": "2023-01-01T00:00:00Z",
-            "from_period": "2005-01-01T00:00:00Z",
-            "period_type": ["Y"],
-        },
-        "Demographics": {
-            "count": 151,
-            "sources": ["United Nations"],
-            "to_period": "2100-01-01T00:00:00Z",
-            "from_period": "1950-01-01T00:00:00Z",
-            "period_type": ["Y"],
-        },
-    }
-
-
-
-Now that we can see what data models are available, you can retrieve the data by calling the data model name on the continent object:
+Populating a data model with data
+---------------------------------
+Now that we can see what data models are available, you can retrieve the datamodel
+by calling the data model name on the continent object:
 
 .. code-block:: python
 
     # Retrieving demographic data for Europe
     >>> europe = my_datagarden_api.europe
     >>> europe_demographics = europe.demographics
+    >>> print(type(europe_demographics))
     >>> print(europe_demographics)
 
-
-This data model method returns an object of type TheDataGardenRegionalDataModel:
+The demographics attribute is in fact an object of type TheDataGardenRegionalDataModel.
+By printing the object you can see what type of records as well as the number of
+records that it contains. By default there are no records in the object:
 
 .. code-block:: console
 
-    TheDataGardenRegionalDataModel : Demographics : (count=5)
+    <class 'the_datagarden.models.regional_data_model.TheDataGardenRegionalDataModel'>
+    TheDataGardenRegionalDataModel : Demographics : (count=0)
 
-How you can use this class to extract and use the data is described in the :doc:`regional_data_model` page.
-Here it is sufficient to know that an instance of this class holds a list of RegionalDataRecord instances.
-Each RegionalDataRecord instance contains the data for a unique combination of region, source, period and period type.
-You can quickly view the available data by converting the object to a Polars or Pandas dataframe:
+
+When you call the demographics object (ie. when you call the TheDataGardenRegionalDataModel),
+it automatically fetches data from The DataGarden API.
+If you don't specify any query parameters, it will return the API's default dataset.
+For details about these default values, please refer to https://www.the-datagarden.io/api-docs.
+
+.. code-block:: python
+
+    # Calling the germany demographics attribute without query parameters
+    # will populate the object (europe_demographics) with the default dataset from The DataGarden API
+    >>> europe = my_datagarden_api.europe
+    >>> europe_demographics = europe.demographics
+    >>> europe_demographics()
+    >>> print(europe_demographics)
+
+As you can see, in this example de demographic attribute now contains 9 records:
+
+.. code-block:: console
+
+    TheDataGardenRegionalDataModel : Demographics : (count=3)
+
+Adding query parameters is easy, in this example we will retrieve data from 2010 to 2025:
+
+.. code-block:: python
+
+    # Calling the germany demographics attribute with query parameters
+    >>> europe = my_datagarden_api.europe
+    >>> europe_demographics = europe.demographics
+    >>> europe_demographics(period_from="2010-01-01", period_to="2024-01-01")
+    >>> print(europe_demographics)
+
+Now the demographic attribute contains 15 records.
+
+.. code-block:: console
+
+    TheDataGardenRegionalDataModel : Demographics : (count=15)
+
+The counter in the result above represents the number of RegionalDataRecords retrieved by the TheDataGardenRegionalDataModel
+based upon the queries from the user. Each RegionalDataRecord represents a distinct data point for the datamodel's
+source, period, and period type. So for example for the yearly data you will find max 1 record per year per data source.
+
+For more details please see the :doc:`regional_data_model` documentation.
+
+Converting to DataFrames
+------------------------
+To view your data in a tabular format, you can easily convert it to either a Polars or Pandas dataframe:
 
 .. code-block:: python
 
     >>> europe = my_datagarden_api.europe
-    >>> europe_df = europe.to_polars()  # or europe.to_pandas()
+    >>> europe_demographics = europe.demographics
+    >>> europe_demographics(period_from="2010-01-01", period_to="2024-01-01")
+    >>> europe_df = europe_demographics.to_polars()  # or europe_demographics.to_pandas()
     >>> print(europe_df.head())
     >>> print(europe_df.columns)
+
 
 .. code-block:: console
 
@@ -87,14 +159,14 @@ You can quickly view the available data by converting the object to a Polars or 
     │ ---    ┆ ---         ┆ ---            ┆ ---      ┆   ┆ ---            ┆ ---                  ┆ ---         ┆ ---          │
     │ str    ┆ str         ┆ str            ┆ str      ┆   ┆ str            ┆ str                  ┆ str         ┆ str          │
     ╞════════╪═════════════╪════════════════╪══════════╪═══╪════════════════╪══════════════════════╪═════════════╪══════════════╡
-    │ Europe ┆ continent   ┆ 908            ┆ __       ┆ … ┆ United Nations ┆ 2020-01-01T00:00:00Z ┆ Y           ┆ Demographics │
-    │ Europe ┆ continent   ┆ 908            ┆ __       ┆ … ┆ United Nations ┆ 2021-01-01T00:00:00Z ┆ Y           ┆ Demographics │
-    │ Europe ┆ continent   ┆ 908            ┆ __       ┆ … ┆ United Nations ┆ 2022-01-01T00:00:00Z ┆ Y           ┆ Demographics │
-    │ Europe ┆ continent   ┆ 908            ┆ __       ┆ … ┆ United Nations ┆ 2023-01-01T00:00:00Z ┆ Y           ┆ Demographics │
-    │ Europe ┆ continent   ┆ 908            ┆ __       ┆ … ┆ United Nations ┆ 2024-01-01T00:00:00Z ┆ Y           ┆ Demographics │
+    │ Europe ┆ continent   ┆ 908            ┆ __       ┆ … ┆ United Nations ┆ 2010-01-01T00:00:00Z ┆ Y           ┆ Demographics │
+    │ Europe ┆ continent   ┆ 908            ┆ __       ┆ … ┆ United Nations ┆ 2011-01-01T00:00:00Z ┆ Y           ┆ Demographics │
+    │ Europe ┆ continent   ┆ 908            ┆ __       ┆ … ┆ United Nations ┆ 2012-01-01T00:00:00Z ┆ Y           ┆ Demographics │
+    │ Europe ┆ continent   ┆ 908            ┆ __       ┆ … ┆ United Nations ┆ 2013-01-01T00:00:00Z ┆ Y           ┆ Demographics │
+    │ Europe ┆ continent   ┆ 908            ┆ __       ┆ … ┆ United Nations ┆ 2014-01-01T00:00:00Z ┆ Y           ┆ Demographics │
     └────────┴─────────────┴────────────────┴──────────┴───┴────────────────┴──────────────────────┴─────────────┴──────────────┘
     ['name', 'region_type', 'un_region_code', 'iso_cc_2', 'local_region_code', 'local_region_code_type', 'parent_region_code',
-    'parent_region_code_type', 'parent_region_type', 'region_level', 'source_name', 'period', 'period_type', 'data_type']
+     'parent_region_code_type', 'parent_region_type', 'region_level', 'source_name', 'period', 'period_type', 'data_model_name']
 
 
 Notice that europe_df.columns does not contain any columns for the actual demographics data.
