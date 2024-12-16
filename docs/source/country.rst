@@ -19,7 +19,7 @@ The object ``germany`` is an instance of the class ``Country`` represented by th
 
 .. code-block:: console
 
-    Region Germany
+    Country : Germany
     <class 'the_datagarden.api.regions.country.Country'>
 
 
@@ -167,7 +167,7 @@ Adding query parameters is easy, in this example we will retrieve data from 2010
     # Calling the germany demographics attribute with query parameters
     >>> germany = my_datagarden_api.germany
     >>> germany_demographics = germany.demographics
-    >>> germany_demographics(from_date="2010-01-01", to_date="2025-01-01")
+    >>> germany_demographics(period_from="2010-01-01", period_to="2025-01-01")
     >>> print(germany_demographics)
 
 Now the demographic attribute contains 30 records.
