@@ -14,12 +14,12 @@ retrieve data for a specific continent, country or subregion easily by calling t
 .. code-block:: python
 
     # initialize a country object and retrieve the demographics attribute
-    >>> nl = the_datagarden_api.netherlands
+    >>> nl = the_datagarden_api.netherlands # or nl = the_datagarden_api.NL
     >>> nl_demographics = nl.demographics()
     TheDataGardenRegionalDataModel : Demographics : (count=5)
 
 Object ``nl_demographics`` will now hold 5 records containing demographic data for the Netherlands for a specific set
-of periods (by defaut records with yearly data are retrieved). You can convert ``nl_demographics`` to a pandas or polars so
+of periods (by default records with yearly data are retrieved). You can convert ``nl_demographics`` to a pandas or polars so
 that you can work with the data in a tabular format.
 
 .. code-block:: python
