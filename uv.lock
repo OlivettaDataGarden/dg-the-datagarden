@@ -834,7 +834,7 @@ wheels = [
 
 [[package]]
 name = "the-datagarden"
-version = "0.1.0"
+version = "1.1.0"
 source = { virtual = "." }
 dependencies = [
     { name = "click" },
@@ -866,7 +866,7 @@ requires-dist = [
     { name = "pyjwt", specifier = ">=2.10.0" },
     { name = "python-decouple", specifier = ">=3.8" },
     { name = "requests", specifier = ">=2.32.3" },
-    { name = "the-datagarden-models", specifier = ">=1.5.6" },
+    { name = "the-datagarden-models", specifier = ">=1.6.3" },
 ]
 
 [package.metadata.requires-dev]
@@ -881,15 +881,15 @@ dev = [
 
 [[package]]
 name = "the-datagarden-models"
-version = "1.5.6"
+version = "1.6.4"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "click" },
     { name = "pydantic" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/a2/30/e183619a06d48680fadb49bc178a13a1fa80aadd4c23a5fa639f334dbfe6/the_datagarden_models-1.5.6.tar.gz", hash = "sha256:1bc0da62f8e6f0a6ec99f3bc2940e18a512f3192a51b433bc4ae4625c5a3f3fc", size = 16595 }
+sdist = { url = "https://files.pythonhosted.org/packages/58/cc/5680a334642d6ca17ba7f748ec48796ec1a498200a890ce92b610629f125/the_datagarden_models-1.6.4.tar.gz", hash = "sha256:21ed456301ef175321d47e722aa9991baef5ed557676e26b7f85e74446c64abb", size = 20449 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/03/31/a7dae77ae1a72b660014fc8ee54699405ad358fbb76235404d67b5c64597/the_datagarden_models-1.5.6-py3-none-any.whl", hash = "sha256:9919869d66f135520dc834facd9c1473ddb9fbd89f74aacad5f1e1ec994e946b", size = 26930 },
+    { url = "https://files.pythonhosted.org/packages/15/48/a18327a0b65bc59fef1d5cc2ed130d2dd3ed249bebdd7baeac78d5a78636/the_datagarden_models-1.6.4-py3-none-any.whl", hash = "sha256:696ef9a5e2857471b2d9cbc3722fa548aec2d68eaf19a2d8771ce7b0d8868c60", size = 30384 },
 ]
 
 [[package]]

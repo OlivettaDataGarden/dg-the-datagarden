@@ -8,9 +8,14 @@ from the_datagarden.api.authentication.settings import REGISTRATION_URL_EXTENSIO
 class CredentialsFromUserInput:
     def get_missing_credentials(self, the_datagarden_api_url: str) -> TheDatagardenCredentialsDict:
         print()
-        print("Credentials to access The Data Garden API are missing.")
+        print("Welcome to The Data Garden API.")
+        print()
+        print("  You can start using the API with an account from The-Datagarden.io.")
+        print("  Please provide your credentials or create a new account.")
+        print("  Check www.the-datagarden.io for more information.")
+        print()
         choice = input(
-            "Do you want to (1) enroll in the API or (2) provide existing credentials? " "Enter 1 or 2: "
+            "Do you want to (1) create a new account or (2) provide existing credentials? " "Enter 1 or 2: "
         )
 
         if choice == "1":
@@ -27,8 +32,10 @@ class CredentialsFromUserInput:
 
     def enroll_to_api(self, the_datagarden_api_url: str) -> TheDatagardenCredentialsDict | None:
         print("Enrolling in The Data Garden API...")
-        email = input("Enter your email: ")
+        print()
+        email = input("  Enter your email: ")
         password = self.get_confirmed_password()
+        print()
 
         data = {"email": email, "password": password}
         registration_url = the_datagarden_api_url + REGISTRATION_URL_EXTENSION
@@ -48,8 +55,8 @@ class CredentialsFromUserInput:
 
     def get_confirmed_password(self) -> str:
         while True:
-            password = input("Enter your password: ")
-            confirm_password = input("Confirm your password: ")
+            password = input("  Enter your password: ")
+            confirm_password = input("  Confirm your password: ")
 
             if password == confirm_password:
                 return password
@@ -58,8 +65,9 @@ class CredentialsFromUserInput:
 
     def provide_existing_credentials(self) -> TheDatagardenCredentialsDict:
         print("Please provide your existing credentials...")
-        email = input("Enter your email: ")
-        password = input("Enter your password: ")
+        print()
+        email = input("  Enter your email: ")
+        password = input("  Enter your password: ")
         return TheDatagardenCredentialsDict(
             email=email,
             password=password,

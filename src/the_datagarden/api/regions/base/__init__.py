@@ -4,7 +4,7 @@ from typing import Literal
 
 from pydantic import BaseModel
 
-from the_datagarden.api.authentication.settings import INCLUDE_STATISTIC_PARAM
+from the_datagarden.api.authentication.settings import STATISTICS_URL_EXTENSION
 from the_datagarden.api.base import BaseApi
 from the_datagarden.models import TheDataGardenRegionalDataModel, TheDataGardenRegionGeoJSONModel
 
@@ -40,9 +40,8 @@ class Region:
     A region in The Data Garden.
     """
 
-    _info: dict = {}
-    _available_models: dict = {}
-    _model_data_storage: dict[str, TheDataGardenRegionalDataModel] = {}
+    REGION_STATS_MODEL: type[BaseModel]
+    _region_stats: BaseModel | None = None
 
     KEYS: type[StrEnum]
 
@@ -52,10 +51,12 @@ class Region:
     def __init__(self, url: str, api: BaseApi):
         self._region_url = url
         self._api = api
+        self._available_models: dict = {}
+        self._model_data_storage: dict[str, TheDataGardenRegionalDataModel] = {}
         self._geojsons = TheDataGardenRegionGeoJSONModel(api=api, region_url=url)
 
     def __getattr__(self, attr: str):
-        if attr in self._api_model_names:
+        if attr in self.available_model_names:
             return self._model_data_from_storage(model_name=attr)
         if attr == "geojsons":
             return self._geojsons
@@ -66,67 +67,40 @@ class Region:
         stored_model_data = self._model_data_storage.get(model_name, None)
         if not stored_model_data:
             self._model_data_storage[model_name] = TheDataGardenRegionalDataModel(
-                model_name=model_name, api=self._api, region_url=self._region_url
+                model_name=model_name, api=self._api, region_url=self._region_url, meta_data=self.meta_data
             )
             return self._model_data_storage[model_name]
 
         return stored_model_data
 
     @property
-    def info(self) -> dict | None:
+    def meta_data(self) -> BaseModel | None:
         """
-        Get the region info from the API.
+        Get the region statistics info from the API.
         """
-        if not self._info:
-            info_resp = self._api.retrieve_from_api(
-                url_extension=self._region_url,
-                params=INCLUDE_STATISTIC_PARAM,
+        if not self._region_stats:
+            region_stats_resp = self._api.retrieve_from_api(
+                url_extension=self._region_url + STATISTICS_URL_EXTENSION,
             )
-            if info_resp and info_resp.status_code == 200:
-                info_resp_json = info_resp.json()
-                self._info = info_resp_json if isinstance(info_resp_json, dict) else {}
+            if region_stats_resp and region_stats_resp.status_code == 200:
+                region_stats_resp_json = region_stats_resp.json().get(self._key(ResponseKeys.STATISTICS), {})
+                self._region_stats = self.REGION_STATS_MODEL(
+                    region_stats_resp_json if isinstance(region_stats_resp_json, dict) else {}
+                )
 
-        return self._info
+        return self._region_stats
 
     @property
-    def statistics(self) -> dict:
-        if self.info:
-            return self.info.get(self._key(ResponseKeys.STATISTICS), {})
-        return {}
+    def region_types(self) -> list[str]:
+        if not self.meta_data:
+            return []
+        return self.meta_data.region_types
 
     @property
     def available_model_names(self) -> list[str]:
-        if not self._available_models:
-            self._set_available_models()
-        return list(self._available_models.keys())
-
-    @property
-    def available_models(self) -> set:
-        if not self._available_models:
-            self._set_available_models()
-
-        return {item for models_per_level in self._available_models.values() for item in models_per_level}
-
-    @property
-    def _api_model_names(self) -> list[str]:
-        return [model.lower() for model in self.available_models]
-
-    def _set_available_models(self) -> None:
-        if self._available_models:
-            return
-
-        if self.statistics:
-            self._available_models = self._info.get(self._key(ResponseKeys.AVAILABLE_MODELS), [])
-        return
-
-    def generic_regional_data(self, model: str, **kwargs) -> dict | None:
-        meta_data_resp = self._api.retrieve_from_api(
-            url_extension=self._url + "regional_data/",
-            method="POST",
-        )
-        if meta_data_resp:
-            return meta_data_resp.json()
-        return None
+        if not self.meta_data:
+            return []
+        return self.meta_data.regional_data_models
 
     def _key(self, key: str) -> str:
         return getattr(self.KEYS, key)

@@ -20,6 +20,8 @@ from the_datagarden.version import __version__
 
 INCLUDE_STATISTIC_PARAM = {"include_statistics": "y"}
 
+STATISTICS_URL_EXTENSION = "statistics/"
+
 SHOW_REQ_DETAIL = config("SHOW_REQ_DETAIL", default=False, cast=bool)
 REQ_TOKEN_URL_EXTENSION = "user/token/"
 REFRESH_TOKEN_URL_EXTENSION = "user/token/refresh/"
@@ -49,4 +51,4 @@ class URLExtension:
 
 class DynamicEndpointCategories:
     CONTINENTS = "continents"
-    COUNTRIES = "counties"
+    COUNTRIES = "countries"
