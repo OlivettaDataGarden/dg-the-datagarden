@@ -50,12 +50,6 @@ The demographics model holds lots of submodels and attributes. In this example o
 as the dataframe is way too large to display. For all models and their details see the model data documentation at
 `The DataGarden Data Documentation <https://www.the-datagarden.io/data-docs>`_.
 
-See below a few quick links that will help you find out what data can be found in a Regional DataModel object:
-
-* :ref:`Getting more records from the API <querying-the-api>`
-* :ref:`Inspecting the content of the available records <inspecting-the-content-of-the-available-records>`
-* :ref:`Inspecting the structure of the Regional DataModel <inspecting-data-model-structure>`
-
 Getting started with the SDK
 ----------------------------
 You can start using the SDK out of the box by simply instatiating the TheDataGardenAPI object:
@@ -105,7 +99,7 @@ when creating the TheDataGardenAPI object:
     Initializing : TheDatagardenEnvironment
     At: https://www.the-datagarden.io/
 
-A 3rd way to initialize the SDK is adding your credentials to the ``.env`` file. See the :doc:`authentication` for more information.
+A 3rd way to initialize the SDK is adding your credentials to the ``.env`` file.
 
 
 Getting your first data from The-DataGarden API
@@ -121,7 +115,7 @@ For example, you can retrieve the demographics data for the Netherlands:
     TheDataGardenRegionalDataModel : Demographics : (count=0)
 
 This creates a country object ``nl`` for the Netherlands, which serves as your gateway to all Netherlands-related
-data and its regional subdivisions. For more details about country objects, refer to the :doc:`country` documentation.
+data and its regional subdivisions.
 
 In this getting started section we will work with a demographics object retrieved from the `nl` country object.
 As shown in the example, the ``nl_demographics`` object can be retrieved by simply calling the `demographics`
@@ -138,7 +132,6 @@ The `nl_demographics` object starts empty (count=0). To populate it with data, s
 
 When called without parameters, the API returns data using default settings, which in this case yields 5 records.
 You can customize your data retrieval by specifying parameters such as time periods, period types, and data sources.
-For a complete list of available parameters, check the :doc:`regional_data_model` documentation.
 
 
 The DataGarden Regional DataModel
