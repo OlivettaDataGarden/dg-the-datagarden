@@ -2,14 +2,19 @@
 the-datagarden SDK
 ==================
 
-The-datagarden package is a Python SDK built on top of The-DataGarden API. It provides easy access to continent and country regional hierarchies, as well as public data related to these regions. Additionally, you can retrieve regional GeoJSONs using the SDK. It simplifies the process of converting regional data into DataFrames and/or GeoJSON Feature collections, enabling developers to build upon this data effortlessly.
+The-datagarden package is a Python SDK built on top of The-DataGarden API. The SDK provides easy access to continent and country regional hierarchies,
+as well as public data related to these regions. All data from The-DataGarden API is stored in normalized datamodels like ``Demographics``, ``Health``
+or ``Economics``. This allows you as a data professional to create value from this data without having to worry about the (varying) data structure and
+api's from the sources.
+
+Additionally, The-DataGarden API also provides country and regional GeoJSONs. The SDK makes is easy for you to combine public data abd you own data and merge them into
+geosjon Feature collections, making geographic visualisation easy.
 
 
-The-DataGarden main use case
-----------------------------
-The-DataGarden is a platform that provides a wide range of public data for continents, countries and their subregions.
-The SDK is designed to make it easy to access and work with this data in Python. After initializing the SDK you can
-retrieve data for a specific continent, country or subregion easily by calling the appropriate datamodel.
+The-DataGarden SDK main use case
+--------------------------------
+The SDK is designed to make it easy to access and work with the DataGarden data. After initializing the SDK you simply
+retrieve data for a specific continent, country or subregion by calling the appropriate datamodel.
 
 .. code-block:: python
 
@@ -18,9 +23,8 @@ retrieve data for a specific continent, country or subregion easily by calling t
     >>> nl_demographics = nl.demographics()
     TheDataGardenRegionalDataModel : Demographics : (count=5)
 
-Object ``nl_demographics`` will now hold 5 records containing demographic data for the Netherlands for a specific set
-of periods (by default records with yearly data are retrieved). You can convert ``nl_demographics`` to a pandas or polars so
-that you can work with the data in a tabular format.
+In this example the `nl_demographics` object holds 5 records. Each record contains demographic data for the Netherlands for a specific
+period and period type combination. The data can be made accessible in a tabular format by converting the object to a pandas or polars dataframe.
 
 .. code-block:: python
 
@@ -42,15 +46,18 @@ that you can work with the data in a tabular format.
     │ 2024-01-01T0Z ┆ United Nat ┆ Demographics    ┆ 1.8165554e7      ┆ 9.055978e6            ┆ 9.172763e6              │
     └───────────────┴────────────┴─────────────────┴──────────────────┴───────────────────────┴─────────────────────────┘
 
-In this example a limited number of columns are displayed as the dataframe in this form would be too large to display.
-See the :doc:`working_with_regional_data_model` for more information on how to select sub models and/or sub sets of the data
-that suit your needs.
-See also model data documentation at `The DataGarden Data Documentation <https://www.the-datagarden.io/data-docs>`_ for more information on the available data models
-and their attributes.
+The demographics model holds lots of submodels and attributes. In this example only a limited number of attributes are listed
+as the dataframe is way too large to display. For all models and their details see the model data documentation at
+`The DataGarden Data Documentation <https://www.the-datagarden.io/data-docs>`_.
 
+See below a few quick links that will help you find out what data can be found in a Regional DataModel object:
 
-Getting started
----------------
+* :ref:`Getting more records from the API <querying-the-api>`
+* :ref:`Inspecting the content of the available records <inspecting-the-content-of-the-available-records>`
+* :ref:`Inspecting the structure of the Regional DataModel <inspecting-data-model-structure>`
+
+Getting started with the SDK
+----------------------------
 You can start using the SDK out of the box by simply instatiating the TheDataGardenAPI object:
 
 .. code-block:: python
@@ -84,8 +91,8 @@ simply select 1 to create a new account.
     Initializing : TheDatagardenEnvironment
     At: https://www.the-datagarden.io/
 
-If you already have an account at the-datagarden.io,
-you can either select option 2 or directly provide your credentials when creating the TheDataGardenAPI object:
+If you already have an account at the-datagarden.io, you can either select option 2 or directly provide your credentials
+when creating the TheDataGardenAPI object:
 
 .. code-block:: python
 
@@ -97,6 +104,9 @@ you can either select option 2 or directly provide your credentials when creatin
 
     Initializing : TheDatagardenEnvironment
     At: https://www.the-datagarden.io/
+
+A 3rd way to initialize the SDK is adding your credentials to the ``.env`` file. See the :doc:`authentication` for more information.
+
 
 Getting your first data from The-DataGarden API
 -----------------------------------------------
@@ -182,7 +192,7 @@ Retrieving the GeoJSON for the Netherlands and its provinces is straightforward 
         │ ---           ┆ ---         ┆ ---           ┆ ---          ┆ ---                    │
         │ str           ┆ str         ┆ str           ┆ i64          ┆ struct[3]              │
         ╞═══════════════╪═════════════╪═══════════════╪══════════════╪════════════════════════╡
-        │ Netherlands   ┆ country     �� 528           ┆ 0            ┆ {"Feature",{"Netherland│
+        │ Netherlands   ┆ country     ┆ 528           ┆ 0            ┆ {"Feature",{"Netherland│
         │ Drenthe       ┆ province    ┆ NL13          ┆ 2            ┆ {"Feature",{"Drenthe",2│
         │ …             ┆ …           ┆ …             ┆ …            ┆ …                      │
         │ Zuid-Holland  ┆ province    ┆ NL33          ┆ 2            ┆ {"Feature",{"Zuid-Holla│
@@ -216,10 +226,10 @@ Visit https://www.the-datagarden.io for to register for free. Also, check out th
    :maxdepth: 2
    :caption: Content Index:
 
-   the_datagarden_api
    continent
    country
-   authentication
+   querying_the_api
    regional_data_model
    working_with_regional_data_model
    regional_data_record
+   authentication
