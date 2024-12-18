@@ -2,10 +2,24 @@
 Continent Object
 ================
 
-The Continent object
---------------------
-The continent object provides methods to get public data for a continent or its direct subregions (i.e. the countries).
-A countint object can simply be retrieved from TheDataGardenAPI object by calling the continent name:
+An overview of the continents can be retrieved from the TheDataGardenAPI object with the ``continents`` method.
+
+.. code-block:: python
+
+    # Retrieving continents list for The Data Garden API
+    >>> from the_datagarden import TheDataGardenAPI
+    >>> my_datagarden_api = TheDataGardenAPI()
+    >>> my_datagarden_api.continents()
+
+.. code-block:: console
+
+    dict_keys(['africa', 'asia', 'europe', 'latin_america_and_the_caribbean', 'northern_america', 'oceania'])
+
+The continents method simply returns a list of available continents. You can directly access the continent objects in two ways. First by calling the continents method with the include_details flag:
+
+Retrieving continent objects
+----------------------------
+A continent object can simply be retrieved from TheDataGardenAPI object by calling the continent name:
 
 .. code-block:: python
 
@@ -15,6 +29,8 @@ A countint object can simply be retrieved from TheDataGardenAPI object by callin
     >>> europe = my_datagarden_api.europe
     >>> print(europe)
     >>> print(type(europe))
+
+A continent object is returned which provides methods to get public data for a continent or its direct subregions (i.e. the countries).
 
 .. code-block:: console
 

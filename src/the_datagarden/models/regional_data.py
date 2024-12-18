@@ -17,6 +17,23 @@ UNIQUE_FIELDS = [
     "period_type",
     "source_name",
 ]
+DEFAULT_COLUMNS_TO_EXCLUDE = [
+    "datagarden_model_version",
+    "name",
+    "region_type",
+    "un_region_code",
+    "iso_cc_2",
+    "local_region_code",
+    "local_region_code_type",
+    "parent_region_code",
+    "parent_region_code_type",
+    "parent_region_type",
+    "region_level",
+    "source_name",
+    "data_model_name",
+    "period",
+    "period_type",
+]
 
 
 class RegionalDataRecord(BaseModel):
@@ -328,17 +345,67 @@ class TheDataGardenRegionalDataModel:
 
     def summary(self) -> dict:
         """
-        rer model's structure (submodels and attributes)
+        return model's structure (submodels and attributes)
         """
         return self._model.legends().summary()
 
-    def describe(self) -> pl.DataFrame:
-        return self.full_model_to_polars().describe()
+    def describe(
+        self,
+        include_attributes: list[str] | None = None,
+        exclude_attributes: list[str] | None = None,
+        filter_expr: pl.Expr | None = None,
+    ) -> pl.DataFrame:
+        df = self.full_model_to_polars()
+        if df.is_empty():
+            raise ValueError("No data loaded for this model. Data is needed to describe the model.")
 
-    def show_availability_per_attribute(self):
-        describe_df = self.describe()
-        columns_not_to_show = ["statistic", "name", "region_type"]
-        row_dicts_df = describe_df.select(
-            [col for col in describe_df.columns if col not in columns_not_to_show]
+        if filter_expr is not None:
+            df = df.filter(filter_expr)
+
+        if include_attributes:
+            return df.select(include_attributes).describe()
+
+        attributes_to_exclude = DEFAULT_COLUMNS_TO_EXCLUDE.copy()
+        if exclude_attributes:
+            attributes_to_exclude.extend(exclude_attributes)
+        return df.select([col for col in df.columns if col not in attributes_to_exclude]).describe()
+
+    def data_availability_per_attribute(
+        self, include_attributes: list[str] | None = None, filter_expr: pl.Expr | None = None
+    ):
+        if include_attributes:
+            describe_df = self.describe(include_attributes=include_attributes, filter_expr=filter_expr)
+        else:
+            describe_df = self.describe(
+                exclude_attributes=DEFAULT_COLUMNS_TO_EXCLUDE, filter_expr=filter_expr
+            )
+
+        describe_df = describe_df.with_columns(
+            pl.when(pl.col("statistic").is_in(["count", "null_count"]))
+            .then(pl.all().exclude("statistic").cast(pl.Int64))
+            .otherwise(pl.all().exclude("statistic"))
         )
-        print(row_dicts_df)
+
+        return describe_df
+
+    def show_data_availability_per_attribute(
+        self, include_attributes: list[str] | None = None, filter_expr: pl.Expr | None = None
+    ):
+        describe_df = self.data_availability_per_attribute(include_attributes, filter_expr)
+        stats_by_column = {
+            column: dict(
+                zip(describe_df.get_column("statistic"), describe_df.get_column(column), strict=True)
+            )
+            for column in describe_df.columns
+            if column != "statistic"
+        }
+
+        max_column_length = max(len(column) for column in stats_by_column.keys())
+
+        for column, stats in stats_by_column.items():
+            print(
+                f"{column} : {" " * (max_column_length + 3 - len(column))}"
+                f"{int(stats['count'] + stats['null_count'])}"
+                f" of which with data: {int(stats['count'])} "
+                f"({int(stats['count']) / (int(stats['count'] + stats['null_count'])) * 100:.0f}%)"
+            )
