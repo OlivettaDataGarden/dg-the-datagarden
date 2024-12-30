@@ -41,6 +41,8 @@ DEFAULT_HEADER: dict[str, str] = {
 
 
 class URLExtension:
+    ROOT = ""
+    PULSE = "pulse/"
     WORLD = "world/"
     WORLD_DATA = "world/regional_data/"
     CONTINENTS = "continent/"

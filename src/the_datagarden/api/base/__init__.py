@@ -26,6 +26,7 @@ from the_datagarden.abc.authentication import DatagardenEnvironment
 from the_datagarden.api.authentication import AccessToken
 from the_datagarden.api.authentication.environment import TheDatagardenProductionEnvironment
 from the_datagarden.api.authentication.settings import (
+    DEFAULT_HEADER,
     SHOW_REQ_DETAIL,
     DynamicEndpointCategories,
     URLExtension,
@@ -49,8 +50,17 @@ class BaseDataGardenAPI(BaseApi):
         password: str | None = None,
     ):
         self._environment = environment or TheDatagardenProductionEnvironment
-        self._tokens = self.ACCESS_TOKEN(self._environment, email, password)
         self._base_url = self._environment().the_datagarden_url
+        self._api_status = self._check_pulse()
+        self._tokens = self.ACCESS_TOKEN(self._environment, email, password)
+
+    def _check_pulse(self) -> bool:
+        url = self._generate_url(URLExtension.PULSE)
+        response = requests.request(method="GET", url=url, headers=DEFAULT_HEADER.copy())
+
+        if response.status_code == 200:
+            return True
+        return False
 
     def _generate_url(self, url_extension: str) -> str:
         url = self._base_url + url_extension

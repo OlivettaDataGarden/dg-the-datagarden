@@ -13,15 +13,25 @@ geosjon Feature collections, making geographic visualisation easy.
 
 The-DataGarden SDK main use case
 --------------------------------
+To start working with the GeoDatagarden SDK, you need to pip install the package.
+
+.. code-block:: console
+
+    pip install the-datagarden
+
+
+After that you can initialize the SDK. This is done by creating an instance of the ``TheDataGardenAPI`` class.
 The SDK is designed to make it easy to access and work with the DataGarden data. After initializing the SDK you simply
 retrieve data for a specific continent, country or subregion by calling the appropriate datamodel.
 
 .. code-block:: python
 
     # initialize a country object and retrieve the demographics attribute
+    >>> from the-datagarden import TheDataGardenAPI
+    >>> the_datagarden_api = TheDataGardenAPI()
     >>> nl = the_datagarden_api.netherlands # or nl = the_datagarden_api.NL
     >>> nl_demographics = nl.demographics()
-    TheDataGardenRegionalDataModel : Demographics : (count=5)
+    TheDataGardenRegionalDataModel : Demographics : (count=6)
 
 In this example the `nl_demographics` object holds 5 records. Each record contains demographic data for the Netherlands for a specific
 period and period type combination. The data can be made accessible in a tabular format by converting the object to a pandas or polars dataframe.
