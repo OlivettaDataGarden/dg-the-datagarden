@@ -1,6 +1,6 @@
 [project]
 name = "the-datagarden"
-version = "1.2.3"
+version = "1.2.4"
 description = "Public data made easy."
 readme = "README.rst"
 requires-python = ">=3.10"
@@ -57,7 +57,7 @@ the-datagarden = "the_datagarden.cli:main"
 "Read the Docs" = "https://dg-the-datagarden.readthedocs.io/en/stable/"
 "The-DataGarden" = "https://www.the-datagarden.io/"
 "API documentation" = "https://www.the-datagarden.io/api-docs"
-"Source" = "https://github.com/the-datagarden/the-datagarden"
+"Source" = "https://github.com/OlivettaDataGarden/dg-the-datagarden"
 
 
 [tool.ruff]
