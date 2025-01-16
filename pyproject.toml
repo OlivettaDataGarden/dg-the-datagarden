@@ -1,6 +1,6 @@
 [project]
 name = "the-datagarden"
-version = "1.2.4"
+version = "1.2.5"
 description = "Public data made easy."
 readme = "README.rst"
 requires-python = ">=3.10"
