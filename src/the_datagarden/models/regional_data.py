@@ -404,7 +404,7 @@ class TheDataGardenRegionalDataModel:
 
         for column, stats in stats_by_column.items():
             print(
-                f"{column} : {" " * (max_column_length + 3 - len(column))}"
+                f"{column} : {' ' * (max_column_length + 3 - len(column))}"
                 f"{int(stats['count'] + stats['null_count'])}"
                 f" of which with data: {int(stats['count'])} "
                 f"({int(stats['count']) / (int(stats['count'] + stats['null_count'])) * 100:.0f}%)"
