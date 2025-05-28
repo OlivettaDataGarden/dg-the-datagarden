@@ -1,6 +1,6 @@
 [project]
 name = "the-datagarden"
-version = "1.2.5"
+version = "1.2.6"
 description = "Public data made easy."
 readme = "README.rst"
 requires-python = ">=3.10"
@@ -40,7 +40,7 @@ classifiers = [
 
 ]
 
-[dependency-groups]
+[project.optional-dependencies]
 dev = [
     "mypy>=1.13.0",
     "pre-commit>=4.0.1",
